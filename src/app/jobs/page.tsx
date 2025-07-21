@@ -2,6 +2,10 @@ import { prisma } from '@/lib/db';
 import JobCard from '@/components/JobCard';
 import Link from 'next/link';
 
+// Force dynamic rendering to avoid build-time database calls
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getJobs() {
   const jobs = await prisma.job.findMany({
     where: { isActive: true },
