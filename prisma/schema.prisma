@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Candidate {
+  id         String      @id @default(cuid())
+  firstName  String
+  lastName   String
+  email      String      @unique
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  interviews Interview[]
+
+  @@map("candidates")
+}
+
+model Job {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  department  String?
+  location    String?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  interviews  Interview[]
+
+  @@map("jobs")
+}
+
+model Interview {
+  id          String              @id @default(cuid())
+  status      InterviewStatus     @default(PENDING)
+  scheduledAt DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+  score       Float?
+  feedback    String?
+  videoUrl    String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  candidateId String
+  jobId       String
+  questions   InterviewQuestion[]
+  summary     InterviewSummary?
+  candidate   Candidate           @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  job         Job                 @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@map("interviews")
+}
+
+model InterviewQuestion {
+  id          String    @id @default(cuid())
+  question    String
+  answer      String?
+  order       Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  interviewId String
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+
+  @@map("interview_questions")
+}
+
+model InterviewSummary {
+  id                 String    @id @default(cuid())
+  overallScore       Float?
+  technicalScore     Float?
+  communicationScore Float?
+  culturalFitScore   Float?
+  strengths          String[]
+  weaknesses         String[]
+  recommendations    String
+  aiAnalysis         String
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  interviewId        String    @unique
+  interview          Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+
+  @@map("interview_summaries")
+}
+
+enum InterviewStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
