@@ -11,7 +11,6 @@ interface InterviewProps {
 const Interview = ({ userData, questions }: InterviewProps) => {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState<string[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -20,6 +19,8 @@ const Interview = ({ userData, questions }: InterviewProps) => {
 
   // Initialize camera
   useEffect(() => {
+    let currentStream: MediaStream | null = null;
+    
     const initCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -29,7 +30,7 @@ const Interview = ({ userData, questions }: InterviewProps) => {
           }, 
           audio: true 
         });
-        setVideoStream(stream);
+        currentStream = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -41,8 +42,8 @@ const Interview = ({ userData, questions }: InterviewProps) => {
     initCamera();
 
     return () => {
-      if (videoStream) {
-        videoStream.getTracks().forEach(track => track.stop());
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
       }
     };
   }, []);

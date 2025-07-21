@@ -1,11 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable experimental features for better performance
-  experimental: {
-    turbopack: false, // Disable turbopack for production builds
-    serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
-  },
+  // External packages for server components (moved from experimental)
+  serverExternalPackages: ['@prisma/client', 'prisma'],
   
   // Optimize images
   images: {
@@ -20,9 +17,6 @@ const nextConfig: NextConfig = {
   
   // Enable compression
   compress: true,
-  
-  // Optimize bundle
-  swcMinify: true,
   
   // Generate standalone output for better cold starts
   output: 'standalone',
