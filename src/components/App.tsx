@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { useAppState } from '../hooks/useAppState';
+import { useAppState, UserData } from '../hooks/useAppState';
 import { Welcome } from './index';
 import { Explanation } from './index';
 import { Interview } from './index';
@@ -12,7 +12,7 @@ const App = () => {
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
   const [questionError, setQuestionError] = useState<string | null>(null);
 
-  const handleWelcomeSubmit = (formData: any) => {
+  const handleWelcomeSubmit = (formData: UserData) => {
     saveUserData(formData);
     navigateToScreen('explanation');
   };

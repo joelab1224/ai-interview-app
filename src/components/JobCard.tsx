@@ -1,13 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 
 interface Job {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   department: string | null;
   location: string | null;
   isActive: boolean;
@@ -82,7 +81,7 @@ export default function JobCard({ job }: JobCardProps) {
 
       {/* Description */}
       <p className="text-gray-600 mb-4 line-clamp-3">
-        {job.description}
+        {job.description || 'Sin descripción disponible.'}
       </p>
 
       {/* Location */}

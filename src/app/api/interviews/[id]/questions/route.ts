@@ -4,12 +4,14 @@ import { prisma } from '@/lib/db';
 // POST /api/interviews/[id]/questions - Create questions for interview
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const interviewId = params.id;
+    const resolvedParams = await params;
+    const interviewId = resolvedParams.id;
     const body = await request.json();
-    const { jobPosition, candidateName } = body;
+    // Extract body data if needed for future use
+    console.log('Request body:', body);
     
     // Validate interview exists
     const interview = await prisma.interview.findUnique({
@@ -71,10 +73,11 @@ export async function POST(
 // GET /api/interviews/[id]/questions - Get questions for interview
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const interviewId = params.id;
+    const resolvedParams = await params;
+    const interviewId = resolvedParams.id;
     
     const questions = await prisma.interviewQuestion.findMany({
       where: { interviewId },

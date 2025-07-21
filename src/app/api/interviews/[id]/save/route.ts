@@ -4,10 +4,11 @@ import { prisma } from '@/lib/db';
 // POST /api/interviews/[id]/save - Save interview data after completion
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const interviewId = params.id;
+    const resolvedParams = await params;
+    const interviewId = resolvedParams.id;
     const body = await request.json();
     const { answers, videoUrl, duration } = body;
     
@@ -163,5 +164,36 @@ function generateInitialFeedback(answers: string[], jobTitle: string): string {
   const answerLengths = answers.map(answer => answer?.trim().split(' ').length || 0);
   const avgAnswerLength = answerLengths.reduce((a, b) => a + b, 0) / answerLengths.length;
   
-  let feedback = 'Entrevista completada exitosamente. ';\n  
-  if (avgAnswerLength > 30) {\n    feedback += 'Las respuestas fueron detalladas y bien estructuradas. ';\n  } else if (avgAnswerLength > 15) {\n    feedback += 'Las respuestas fueron adecuadas con un buen nivel de detalle. ';\n  } else {\n    feedback += 'Las respuestas podrían haberse beneficiado de más detalle. ';\n  }\n  \n  // Add job-specific feedback\n  const lowerJobTitle = jobTitle.toLowerCase();\n  if (lowerJobTitle.includes('developer')) {\n    feedback += 'Se recomienda revisar las competencias técnicas mencionadas. ';\n  } else if (lowerJobTitle.includes('design')) {\n    feedback += 'Se valoró la experiencia en diseño y herramientas mencionadas. ';\n  }\n  \n  feedback += 'Un análisis más detallado será generado próximamente.';\n  return feedback;\n}\n\n// Log interview completion for analytics\nasync function logInterviewCompletion(interviewId: string, duration: number, score: number) {\n  // In production, you might want to log this to a separate analytics service\n  console.log(`Interview ${interviewId} completed:`, {\n    duration: duration || 'unknown',\n    score: score.toFixed(2),\n    timestamp: new Date().toISOString()\n  });\n  \n  // Could integrate with analytics services like Mixpanel, Amplitude, etc.\n}
+  let feedback = 'Entrevista completada exitosamente. ';
+
+  if (avgAnswerLength > 30) {
+    feedback += 'Las respuestas fueron detalladas y bien estructuradas. ';
+  } else if (avgAnswerLength > 15) {
+    feedback += 'Las respuestas fueron adecuadas con un buen nivel de detalle. ';
+  } else {
+    feedback += 'Las respuestas podrían haberse beneficiado de más detalle. ';
+  }
+
+  // Add job-specific feedback
+  const lowerJobTitle = jobTitle.toLowerCase();
+  if (lowerJobTitle.includes('developer')) {
+    feedback += 'Se recomienda revisar las competencias técnicas mencionadas. ';
+  } else if (lowerJobTitle.includes('design')) {
+    feedback += 'Se valoró la experiencia en diseño y herramientas mencionadas. ';
+  }
+
+  feedback += 'Un análisis más detallado será generado próximamente.';
+  return feedback;
+}
+
+// Log interview completion for analytics
+async function logInterviewCompletion(interviewId: string, duration: number, score: number) {
+  // In production, you might want to log this to a separate analytics service
+  console.log(`Interview ${interviewId} completed:`, {
+    duration: duration || 'unknown',
+    score: score.toFixed(2),
+    timestamp: new Date().toISOString()
+  });
+  
+  // Could integrate with analytics services like Mixpanel, Amplitude, etc.
+}

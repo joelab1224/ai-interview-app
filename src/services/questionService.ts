@@ -10,8 +10,8 @@ export interface Question {
 export interface GenerateQuestionsResponse {
   success: boolean;
   questions: Question[];
-  userData: any;
-  jobData: any;
+  userData: Record<string, string>;
+  jobData: Record<string, string>;
 }
 
 export const generateInterviewQuestions = async (): Promise<GenerateQuestionsResponse> => {
